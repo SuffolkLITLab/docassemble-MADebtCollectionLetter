@@ -1,0 +1,348 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+---
+metadata:
+  title: >-
+    Cease Letter
+  short title: >-
+    Cease Letter
+  description: |-
+    This interview helps someone in Massachusetts write a cease communications letter to a Debt Collection Agency.
+  can_I_use_this_form: |
+    If you are a person being contacted about a debt you owe, you can use this interview to request the Debt Collection Agency stop contacting you.
+  before_you_start: |
+    This interview will help you write a cease letter to a Debt Collection Agency.
+    
+    Before you get started, please gather:
+    
+    1. Debt Collection Agency's name and address
+    1. Your account number
+    1. Creditor's name
+    
+    When you are finished, you will need to:
+    
+    1. Print this letter
+    1. Sign and mail to the Debt Collection Agency
+  maturity: production
+  estimated_completion_minutes: 10
+  estimated_completion_delta: 5
+  LIST_topics: 
+    - "MO-00-00-00-00"
+    - "MO-04-00-00-00"
+    - "MO-12-00-00-00"
+  tags:
+    - "MO-00-00-00-00"
+    - "MO-04-00-00-00"
+    - "MO-12-00-00-00"
+  authors:
+    - Taylor Koch
+  original_form: []
+  original_form_published_on: ""
+  allowed_courts: []
+  typical_role: "defendant"
+  al_weaver_version: "1.11.0"
+  generated_on: "2024-09-17"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+MA
+  review_date: 2024-09-17
+  form_titles:
+    - Cease Letter
+  form_numbers: []
+  update_notes: |
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-CeaseLetter'
+---
+code: |
+  interview_short_title = "Write a cease letter to a Debt Collection Agency"
+---
+code: |
+  al_form_type = "letter" 
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=1)
+  - debt_collectors: ALPeopleList.using(ask_number=True,target_number=1)
+  - creditors: ALPeopleList.using(ask_number=True,target_number=1)
+---
+sections:
+  - review_cease_letter: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_cease_letter
+code: |
+  # Set the allowed courts for this interview
+  nav.set_section("review_cease_letter")
+  user_role = "defendant"
+  user_ask_role = "defendant"
+  Cease_Letter
+  users.gather()
+  set_parts(subtitle=str(users))
+  debt_collectors.gather()
+  set_progress(20)
+  debt_collectors[0].address.address
+  users[0].account_number
+  creditors.gather()
+  set_progress(40)
+  collection_proof
+  signature_date
+  users[0].address.address
+  interview_order_cease_letter = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  cease_letter_intro
+  interview_order_cease_letter
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  cease_letter_download
+---
+id: Cease_Letter
+continue button field: cease_letter_intro
+question: |
+  Cease Letter
+subquestion: |
+  This interview will help you write a cease letter to a Debt Collection Agency.
+  
+  Before you get started, please gather:
+  
+  1. Debt Collection Agency's name and address
+  1. Your account number
+  1. Creditor's name
+  
+  When you are finished, you will need to:
+  
+  1. Print this letter
+  1. Sign and mail to the Debt Collection Agency
+
+  If you are a person being contacted about a debt you owe, you can use this interview to request the Debt Collection Agency stop contacting you.
+
+  Most people take about 10 minutes to complete this interview.
+---
+id: Cease Letter
+question: |
+  Cease Letter
+subquestion: |
+  Write a letter to request a Debt Collection Agency stop communicating with you about a debt you owe.
+continue button field: Cease_Letter
+---
+id: Account Number
+question: |
+  Account Number
+subquestion: |
+  Enter the account number associated with the debt. This should have been provided by the Debt Collection Agency.
+fields:
+  - "Users[0].account number": users[0].account_number
+    datatype: number
+---
+id: Types of Income Protected from Debt Repayment
+question: |
+  Types of Income Protected from Debt Repayment
+subquestion: |
+  You can't be ordered to pay a debt from certain types of income.
+fields:
+  - "Is your income from:": collection_proof
+    datatype: checkboxes
+    choices:
+      - Social Security (SSI, SSDI)
+      - Old-Age, Survivors, and Disability Insurance (OASDI)
+      - Public Assistance (TAFDC, EAFDC)
+      - Unemployment Compensation
+      - Workers Compensation
+      - Veterans Benefits
+      - Railroad Retirement Benefits
+      - Pensions (public and private)
+      - Retirement Funds
+      - I am employed and I make less than $750 per week
+    required: False
+---
+id: preview cease_letter
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_recipient_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_cease_letter'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: cease_letter_preview_question    
+---
+code: |
+  signature_fields = []
+---
+id: cease letter review screen
+event: review_cease_letter
+question: |
+  Review your answers
+review:
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: signature_date
+    button: |
+      **Date of Signature**:
+      ${ signature_date }
+  - Edit: debt_collectors.revisit
+    button: |
+      **Debt collectors**
+
+      % for item in debt_collectors:
+        * ${ item }
+      % endfor
+  - Edit: creditors.revisit
+    button: |
+      **Creditors**
+
+      % for item in creditors:
+        * ${ item }
+      % endfor
+  - Edit: collection_proof
+    button: |
+      **Is your income from:**:
+      ${ collection_proof }
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+  - Account number: |
+      row_item.account_number if defined("row_item.account_number") else ""
+edit:
+  - name.first
+  - address.address
+  - account_number
+confirm: True
+
+---
+continue button field: debt_collectors.revisit
+question: |
+  Edit debt_collectors
+subquestion: |
+  ${ debt_collectors.table }
+
+  ${ debt_collectors.add_action() }
+---
+table: debt_collectors.table
+rows: debt_collectors
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+edit:
+  - name.first
+  - address.address
+confirm: True
+
+---
+continue button field: creditors.revisit
+question: |
+  Edit creditors
+subquestion: |
+  ${ creditors.table }
+
+  ${ creditors.add_action() }
+---
+table: creditors.table
+rows: creditors
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+id: download cease_letter
+event: cease_letter_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_cease_letter'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=True) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - cease_letter_Post_interview_instructions: ALDocument.using(title="Instructions", filename="cease_letter_next_steps.docx", enabled=True, has_addendum=False)
+  - cease_letter_attachment: ALDocument.using(title="Cease Letter", filename="cease_letter", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[cease_letter_Post_interview_instructions, cease_letter_attachment], filename="cease_letter", title="All forms to download for your records", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[cease_letter_attachment],  filename="cease_letter", title="All forms to file", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: cease_letter_next_steps
+  docx template file: cease_letter_next_steps.docx
+  variable name: cease_letter_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True
+---
+attachment:
+  name: cease letter
+  filename: cease_letter
+  variable name: cease_letter_attachment[i]
+  skip undefined: True
+  docx template file: cease_letter.docx
+  tagged pdf: True
+
+
+
