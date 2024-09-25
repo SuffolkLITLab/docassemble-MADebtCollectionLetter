@@ -4,15 +4,15 @@ include:
 ---
 metadata:
   title: >-
-    Cease Letter
+    Debt Collection Cease Contact Letter
   short title: >-
-    Cease Letter
+    Debt Colection Cease Contact Letter
   description: |-
     This interview helps someone in Massachusetts write a cease communications letter to a Debt Collection Agency.
   can_I_use_this_form: |
     If you are a person being contacted about a debt you owe, you can use this interview to request the Debt Collection Agency stop contacting you.
   before_you_start: |
-    This interview will help you write a cease letter to a Debt Collection Agency.
+    This interview will help you write a cease communications letter to a Debt Collection Agency.
     
     Before you get started, please gather:
     
@@ -64,7 +64,7 @@ code: |
   github_repo_name =  'docassemble-CeaseLetter'
 ---
 code: |
-  interview_short_title = "Write a cease letter to a Debt Collection Agency"
+  interview_short_title = "Write a cease communications letter to a Debt Collection Agency"
 ---
 code: |
   al_form_type = "letter" 
@@ -123,9 +123,9 @@ code: |
 id: Cease_Letter
 continue button field: cease_letter_intro
 question: |
-  Cease Letter
+  Debt Collection Cease Contact Letter
 subquestion: |
-  This interview will help you write a cease letter to a Debt Collection Agency.
+  This interview will help you write a cease communications letter to a Debt Collection Agency.
   
   Before you get started, please gather:
   
@@ -142,9 +142,9 @@ subquestion: |
 
   Most people take about 10 minutes to complete this interview.
 ---
-id: Cease Letter
+id: Debt Collection Cease Communication Letter
 question: |
-  Cease Letter
+  Debt Collection Cease Communication Letter
 subquestion: |
   Write a letter to request a Debt Collection Agency stop communicating with you about a debt you owe.
 continue button field: Cease_Letter
