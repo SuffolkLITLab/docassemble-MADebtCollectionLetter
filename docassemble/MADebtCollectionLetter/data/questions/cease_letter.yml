@@ -155,8 +155,8 @@ question: |
 subquestion: |
   Enter the account number associated with the debt. This should have been provided by the Debt Collection Agency.
 fields:
-  - "Users[0].account number": users[0].account_number
-    datatype: number
+  - "Account Number": users[0].account_number
+    datatype: text
 ---
 id: Types of Income Protected from Debt Repayment
 question: |
