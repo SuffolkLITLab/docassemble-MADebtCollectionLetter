@@ -1,6 +1,6 @@
 import os
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 from fnmatch import fnmatchcase
 from distutils.util import convert_path
 
@@ -52,9 +52,8 @@ setup(name='docassemble.MADebtCollectionLetter',
       author_email='taylor.koch@su.suffolk.edu',
       license='The MIT License',
       url='https://courtformsonline.org',
-      packages=find_packages(),
-      namespace_packages=['docassemble'],
-      install_requires=['docassemble.AssemblyLine>=3.1.0'],
+      packages=find_namespace_packages(),
+      install_requires=['docassemble.AssemblyLine>=3.2.0'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/MADebtCollectionLetter/', package='docassemble.MADebtCollectionLetter'),
      )
