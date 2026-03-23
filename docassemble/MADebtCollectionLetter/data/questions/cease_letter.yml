@@ -56,7 +56,7 @@ metadata:
   form_numbers: []
   update_notes: |
     Added logic to show different templates based on whether the user has protected income and collect signatures
-0---
+---
 code: |
   # This controls the default country and list of states in address field questions
   AL_DEFAULT_COUNTRY = "US"
@@ -66,13 +66,15 @@ code: |
   AL_DEFAULT_STATE = "MA"
 ---
 code: |
-  github_repo_name =  'docassemble-MADebtCollectionLetter'
+  github_repo_name = "docassemble-MADebtCollectionLetter"
 ---
 code: |
-  interview_short_title = "Write a cease communications letter to a debt collection agency"
+  interview_short_title = (
+    "Write a cease communications letter to a debt collection agency"
+  )
 ---
 code: |
-  al_form_type = "letter" 
+  al_form_type = "letter"
 ---
 objects:
   - users: ALPeopleList.using(ask_number=True,target_number=1)
@@ -117,12 +119,12 @@ code: |
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
-      persistent=True,
-      data={
-          "zip": showifdef("users[0].address.zip"),
-          "collection_proof": collection_proof.true_values(),
-          "reached_interview_end": True,
-      },
+    persistent=True,
+    data={
+      "zip": showifdef("users[0].address.zip"),
+      "collection_proof": collection_proof.true_values(),
+      "reached_interview_end": True,
+    },
   )
   cease_letter_download
 ---
