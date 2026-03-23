@@ -98,7 +98,8 @@ code: |
   debt_collectors.gather()
   set_progress(20)
   debt_collectors[0].address.address
-  debt_account_number
+  if user_has_account_number:
+    debt_account_number
   creditors.gather()
   set_progress(40)
   collection_proof
