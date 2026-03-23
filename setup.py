@@ -44,7 +44,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.MADebtCollectionLetter',
-      version='1.0',
+      version='1.1.0',
       description=('Cease Communications Letter to Debt Collection Agency.'),
       long_description='# docassemble.CeaseLetter\r\n\r\nCease Letter\r\n\r\n## Author\r\n\r\nTaylor Koch\r\n\r\n',
       long_description_content_type='text/markdown',

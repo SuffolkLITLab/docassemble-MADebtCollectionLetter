@@ -9,12 +9,12 @@ metadata:
   short title: >-
     Cease Collections
   description: |-
-    This interview helps someone in Massachusetts write a cease communications letter to a debt collection agency.
+    This interview helps someone in Massachusetts write a "cease communications" letter to a debt collection agency.
+    A "cease communications letter" is a letter you can send to a debt collection agency to ask that they stop contacting you about a debt.
   can_I_use_this_form: |
     If you are a person being contacted about a debt you owe, you can use this interview to request the debt collection agency stop contacting you.
-  before_you_start: |
-    This interview will help you write a cease communications letter to a debt collection agency.
-    
+    If you make less than $750 per week, or if your income is from certain protected sources, the debt collection agency may not be able to take certain actions against you, such as garnishing your wages. If that is the case for you, this interview will also help you write a letter to the debt collection agency explaining that.
+  before_you_start: |    
     Before you get started, please gather:
     
     1. debt collection agency's name and address
@@ -38,7 +38,9 @@ metadata:
     - "MO-12-00-00-00"
   authors:
     - Taylor Koch
-  original_form: []
+  help_page_url: https://www.masslegalhelp.org/money-debt/debt-collection/what-are-my-rights-when-debt-collectors-contact-me
+  help_page_title: What are my rights when debt collectors contact me? | MassLegalHelp
+  original_form: https://www.masslegalhelp.org/money-debt/debt-collection/what-are-my-rights-when-debt-collectors-contact-me
   original_form_published_on: ""
   allowed_courts: []
   typical_role: "defendant"
@@ -47,12 +49,14 @@ metadata:
   languages:
     - en
   jurisdiction: NAM-US-US+MA
-  review_date: 2025-07-21
+  review_date: 2026-03-23
   form_titles:
-    - Cease Letter
+    - Stop debt collection communications letter
+    - Stop debt collection communications letter with proof of protected income
   form_numbers: []
   update_notes: |
----
+    Added logic to show different templates based on whether the user has protected income and collect signatures
+0---
 code: |
   # This controls the default country and list of states in address field questions
   AL_DEFAULT_COUNTRY = "US"
@@ -62,7 +66,7 @@ code: |
   AL_DEFAULT_STATE = "MA"
 ---
 code: |
-  github_repo_name =  'docassemble-CeaseLetter'
+  github_repo_name =  'docassemble-MADebtCollectionLetter'
 ---
 code: |
   interview_short_title = "Write a cease communications letter to a debt collection agency"
@@ -87,13 +91,12 @@ code: |
   nav.set_section("review_cease_letter")
   user_role = "defendant"
   user_ask_role = "defendant"
-  Cease_Letter
   users.gather()
   set_parts(subtitle=str(users))
   debt_collectors.gather()
   set_progress(20)
   debt_collectors[0].address.address
-  users[0].account_number
+  debt_account_number
   creditors.gather()
   set_progress(40)
   collection_proof
@@ -110,16 +113,21 @@ code: |
   al_intro_screen
   cease_letter_intro
   interview_order_cease_letter
+  basic_questions_signature_flow
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
       persistent=True,
       data={
           "zip": showifdef("users[0].address.zip"),
+          "collection_proof": collection_proof.true_values(),
           "reached_interview_end": True,
       },
   )
   cease_letter_download
+---
+code: |
+  signature_fields = ["users[0].signature"]
 ---
 id: Cease_Letter
 continue button field: cease_letter_intro
@@ -143,20 +151,15 @@ subquestion: |
 
   Most people take about 10 minutes to complete this interview.
 ---
-id: Cease Letter
-question: |
-  Cease communications Letter
-subquestion: |
-  Write a letter to request a debt collection agency stop communicating with you about a debt you owe.
-continue button field: Cease_Letter
----
 id: Account Number
 question: |
   Account Number
-subquestion: |
-  Enter the account number associated with the debt. This should have been provided by the debt collection agency.
 fields:
-  - "Users[0].account number": users[0].account_number
+  - Do you have an account number assigned by the debt collection agency?: user_has_account_number
+    datatype: yesnoradio
+  - "Account number assigned by debt holder": debt_account_number
+    required: False
+    show if: user_has_account_number
 ---
 id: Types of Income Protected from Debt Repayment
 question: |
@@ -167,16 +170,16 @@ fields:
   - "Is your income from:": collection_proof
     datatype: checkboxes
     choices:
-      - Social Security (SSI, SSDI)
-      - Old-Age, Survivors, and Disability Insurance (OASDI)
-      - Public Assistance (TAFDC, EAFDC)
-      - Unemployment Compensation
-      - Workers Compensation
-      - Veterans Benefits
-      - Railroad Retirement Benefits
-      - Pensions (public and private)
-      - Retirement Funds
-      - I am employed and I make less than $750 per week
+      - Social Security (SSI, SSDI): Social Security (SSI, SSDI)
+      - Old-Age, Survivors, and Disability Insurance (OASDI): Old-Age, Survivors, and Disability Insurance (OASDI)
+      - Public Assistance (TAFDC, EAFDC): Public Assistance (TAFDC, EAFDC)
+      - Unemployment Compensation: Unemployment Compensation
+      - Workers Compensation: Workers Compensation
+      - Veterans Benefits: Veterans Benefits
+      - Railroad Retirement Benefits: Railroad Retirement Benefits
+      - Pensions (public and private): Pensions (public and private)
+      - Retirement Funds: Retirement Funds
+      - I am employed and I make less than $750 per week: I am employed and I make less than $750 per week
     required: False
 ---
 id: preview cease_letter
@@ -194,9 +197,6 @@ subquestion: |
   
   Remember to come back to this window to continue and sign your form.
 continue button field: cease_letter_preview_question    
----
-code: |
-  signature_fields = []
 ---
 id: cease letter review screen
 event: review_cease_letter
@@ -317,13 +317,20 @@ progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - cease_letter_Post_interview_instructions: ALDocument.using(title="Instructions", filename="cease_letter_next_steps.docx", enabled=True, has_addendum=False)
-  - cease_letter_attachment: ALDocument.using(title="Cease Letter", filename="cease_letter", enabled=True, has_addendum=False, )
+  - cease_letter_Post_interview_instructions: ALDocument.using(title="Instructions", filename="cease_letter_next_steps.docx", has_addendum=False, enabled=True)
+  - cease_letter_attachment: ALDocument.using(title="Cease Letter", filename="cease_letter", has_addendum=False)
+  - cease_letter_collection_proof_attachment: ALDocument.using(title="Cease Letter", filename="cease_letter", has_addendum=False, )
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[cease_letter_Post_interview_instructions, cease_letter_attachment], filename="cease_letter", title="All forms to download for your records", enabled=True)
-  - al_recipient_bundle: ALDocumentBundle.using(elements=[cease_letter_attachment],  filename="cease_letter", title="All forms to file", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[cease_letter_Post_interview_instructions, cease_letter_attachment, cease_letter_collection_proof_attachment], filename="cease_letter", title="All forms to download for your records", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[cease_letter_attachment, cease_letter_collection_proof_attachment],  filename="cease_letter", title="All forms to file", enabled=True)
+---
+code: |
+  cease_letter_attachment.enabled = collection_proof.all_false()
+---
+code: |
+  cease_letter_collection_proof_attachment.enabled = collection_proof.any_true()
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
@@ -343,6 +350,11 @@ attachment:
   skip undefined: True
   docx template file: cease_letter.docx
   tagged pdf: True
-
-
-
+---
+attachment:
+  name: cease letter debt collection proof
+  filename: cease_letter
+  variable name: cease_letter_collection_proof_attachment[i]
+  skip undefined: True
+  docx template file: debt-collection-proof-letter.docx
+  tagged pdf: True
