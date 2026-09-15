@@ -237,6 +237,7 @@ review:
       ${ collection_proof }
 ---
 continue button field: users.revisit
+id: "edit users"
 question: |
   Edit users
 subquestion: |
@@ -261,6 +262,7 @@ confirm: True
 
 ---
 continue button field: debt_collectors.revisit
+id: "edit debt collectors"
 question: |
   Edit debt_collectors
 subquestion: |
@@ -282,6 +284,7 @@ confirm: True
 
 ---
 continue button field: creditors.revisit
+id: "edit creditors"
 question: |
   Edit creditors
 subquestion: |
